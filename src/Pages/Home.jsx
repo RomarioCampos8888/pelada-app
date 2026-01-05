@@ -21,10 +21,10 @@ import { Slider } from '@/components/ui/slider';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from 'sonner';
 
-import TeamCard from '@/components/pelada/TeamCard';
-import GameTimer from '@/components/pelada/GameTimer';
-import QueueSection from '@/components/pelada/QueueSection';
-import ConfirmDialog from '@/components/pelada/ConfirmDialog';
+import TeamCard from '@/Components/Pelada/TeamCard';
+import GameTimer from '@/Components/Pelada/GameTimer';
+import QueueSection from '@/Components/Pelada/QueueSection';
+import ConfirmDialog from '@/Components/Pelada/ConfirmDialog';
 
 // Carregar do localStorage
 const loadFromStorage = (key, defaultValue) => {
@@ -588,11 +588,17 @@ export default function Home() {
                   <div>
                     <Label className="text-slate-700 mb-3 block font-medium">Como terminou a partida?</Label>
                     <RadioGroup value={resultType} onValueChange={setResultType} className="space-y-3">
-                      <div className="flex items-center space-x-3 p-4 bg-amber-50 rounded-xl border-2 border-amber-200 cursor-pointer">
+                      <div
+                        onClick={() => setResultType('draw')}
+                        className="flex items-center space-x-3 p-4 bg-amber-50 rounded-xl border-2 border-amber-200 cursor-pointer"
+                      >
                         <RadioGroupItem value="draw" id="draw" />
                         <Label htmlFor="draw" className="cursor-pointer font-medium">⚖️ Empate</Label>
                       </div>
-                      <div className="flex items-center space-x-3 p-4 bg-red-50 rounded-xl border-2 border-red-200 cursor-pointer">
+                      <div
+                        onClick={() => setResultType('win')}
+                        className="flex items-center space-x-3 p-4 bg-red-50 rounded-xl border-2 border-red-200 cursor-pointer"
+                      >
                         <RadioGroupItem value="win" id="win" />
                         <Label htmlFor="win" className="cursor-pointer font-medium">🏆 Houve vencedor</Label>
                       </div>
@@ -606,11 +612,17 @@ export default function Home() {
                     >
                       <Label className="text-slate-700 mb-3 block font-medium">Qual time tem preferência para ficar?</Label>
                       <RadioGroup value={preference} onValueChange={setPreference} className="grid grid-cols-2 gap-3">
-                        <div className="flex items-center space-x-3 p-4 bg-emerald-50 rounded-xl border-2 border-emerald-200 cursor-pointer">
+                        <div
+                          onClick={() => setPreference('teamA')}
+                          className="flex items-center space-x-3 p-4 bg-emerald-50 rounded-xl border-2 border-emerald-200 cursor-pointer"
+                        >
                           <RadioGroupItem value="teamA" id="prefA" />
                           <Label htmlFor="prefA" className="cursor-pointer font-medium text-emerald-700">Time A</Label>
                         </div>
-                        <div className="flex items-center space-x-3 p-4 bg-indigo-50 rounded-xl border-2 border-indigo-200 cursor-pointer">
+                        <div
+                          onClick={() => setPreference('teamB')}
+                          className="flex items-center space-x-3 p-4 bg-indigo-50 rounded-xl border-2 border-indigo-200 cursor-pointer"
+                        >
                           <RadioGroupItem value="teamB" id="prefB" />
                           <Label htmlFor="prefB" className="cursor-pointer font-medium text-indigo-700">Time B</Label>
                         </div>
@@ -625,11 +637,17 @@ export default function Home() {
                     >
                       <Label className="text-slate-700 mb-3 block font-medium">Qual time perdeu?</Label>
                       <RadioGroup value={loser} onValueChange={setLoser} className="grid grid-cols-2 gap-3">
-                        <div className="flex items-center space-x-3 p-4 bg-emerald-50 rounded-xl border-2 border-emerald-200 cursor-pointer">
+                        <div
+                          onClick={() => setLoser('teamA')}
+                          className="flex items-center space-x-3 p-4 bg-emerald-50 rounded-xl border-2 border-emerald-200 cursor-pointer"
+                        >
                           <RadioGroupItem value="teamA" id="loserA" />
                           <Label htmlFor="loserA" className="cursor-pointer font-medium text-emerald-700">Time A</Label>
                         </div>
-                        <div className="flex items-center space-x-3 p-4 bg-indigo-50 rounded-xl border-2 border-indigo-200 cursor-pointer">
+                        <div
+                          onClick={() => setLoser('teamB')}
+                          className="flex items-center space-x-3 p-4 bg-indigo-50 rounded-xl border-2 border-indigo-200 cursor-pointer"
+                        >
                           <RadioGroupItem value="teamB" id="loserB" />
                           <Label htmlFor="loserB" className="cursor-pointer font-medium text-indigo-700">Time B</Label>
                         </div>
