@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate:resources": "npx cordova-res android --skip-config --copy && npx cap sync android"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
