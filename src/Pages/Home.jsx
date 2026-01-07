@@ -60,7 +60,7 @@ export default function Home() {
   
   // Resultado
   const [resultType, setResultType] = useState('draw');
-  const [loser, setLoser] = useState('teamA');
+  const [winner, setWinner] = useState('teamA');
   const [preference, setPreference] = useState('teamA');
 
   // Salvar no localStorage sempre que os estados mudarem
@@ -242,22 +242,22 @@ export default function Home() {
         toast.success('Empate registrado! Time reorganizado.');
       }
     } else {
-      // Vitória - perdedor vai para fila
-      if (loser === 'teamA') {
-        // Time A (perdedor) vai para o final da fila
-        const updatedQueue = [...queue, ...teamA];
-        // Próximos da fila formam o novo Time A
-        const newTeamA = updatedQueue.slice(0, playersPerTeam);
-        const remainingQueue = updatedQueue.slice(playersPerTeam);
-        setTeamA(newTeamA);
-        setQueue(remainingQueue);
-      } else {
+      // Vitória - mover o time perdedor (o oposto do selecionado como vencedor) para a fila
+      if (winner === 'teamA') {
         // Time B (perdedor) vai para o final da fila
         const updatedQueue = [...queue, ...teamB];
         // Próximos da fila formam o novo Time B
         const newTeamB = updatedQueue.slice(0, playersPerTeam);
         const remainingQueue = updatedQueue.slice(playersPerTeam);
         setTeamB(newTeamB);
+        setQueue(remainingQueue);
+      } else {
+        // Time A (perdedor) vai para o final da fila
+        const updatedQueue = [...queue, ...teamA];
+        // Próximos da fila formam o novo Time A
+        const newTeamA = updatedQueue.slice(0, playersPerTeam);
+        const remainingQueue = updatedQueue.slice(playersPerTeam);
+        setTeamA(newTeamA);
         setQueue(remainingQueue);
       }
       toast.success('Resultado registrado! Times reorganizados.');
@@ -614,17 +614,27 @@ export default function Home() {
                       <RadioGroup value={preference} onValueChange={setPreference} className="grid grid-cols-2 gap-3">
                         <div
                           onClick={() => setPreference('teamA')}
-                          className="flex items-center space-x-3 p-4 bg-emerald-50 rounded-xl border-2 border-emerald-200 cursor-pointer"
+                          className="flex flex-col justify-center space-y-2 p-4 bg-emerald-50 rounded-xl border-2 border-emerald-200 cursor-pointer"
                         >
-                          <RadioGroupItem value="teamA" id="prefA" />
-                          <Label htmlFor="prefA" className="cursor-pointer font-medium text-emerald-700">Time A</Label>
+                          <div className="flex items-center space-x-3">
+                            <RadioGroupItem value="teamA" id="prefA" />
+                            <Label htmlFor="prefA" className="cursor-pointer font-medium text-emerald-700">Time A</Label>
+                          </div>
+                          <span className="text-sm text-slate-600">
+                            {teamA.length > 0 ? teamA.join(' ') : '—'}
+                          </span>
                         </div>
                         <div
                           onClick={() => setPreference('teamB')}
-                          className="flex items-center space-x-3 p-4 bg-indigo-50 rounded-xl border-2 border-indigo-200 cursor-pointer"
+                          className="flex flex-col justify-center space-y-2 p-4 bg-indigo-50 rounded-xl border-2 border-indigo-200 cursor-pointer"
                         >
-                          <RadioGroupItem value="teamB" id="prefB" />
-                          <Label htmlFor="prefB" className="cursor-pointer font-medium text-indigo-700">Time B</Label>
+                          <div className="flex items-center space-x-3">
+                            <RadioGroupItem value="teamB" id="prefB" />
+                            <Label htmlFor="prefB" className="cursor-pointer font-medium text-indigo-700">Time B</Label>
+                          </div>
+                          <span className="text-sm text-slate-600">
+                            {teamB.length > 0 ? teamB.join(' ') : '—'}
+                          </span>
                         </div>
                       </RadioGroup>
                     </motion.div>
@@ -635,21 +645,31 @@ export default function Home() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                     >
-                      <Label className="text-slate-700 mb-3 block font-medium">Qual time perdeu?</Label>
-                      <RadioGroup value={loser} onValueChange={setLoser} className="grid grid-cols-2 gap-3">
+                      <Label className="text-slate-700 mb-3 block font-medium">Qual time Venceu?</Label>
+                      <RadioGroup value={winner} onValueChange={setWinner} className="grid grid-cols-2 gap-3">
                         <div
-                          onClick={() => setLoser('teamA')}
-                          className="flex items-center space-x-3 p-4 bg-emerald-50 rounded-xl border-2 border-emerald-200 cursor-pointer"
+                          onClick={() => setWinner('teamA')}
+                          className="flex flex-col justify-center space-y-2 p-4 bg-emerald-50 rounded-xl border-2 border-emerald-200 cursor-pointer"
                         >
-                          <RadioGroupItem value="teamA" id="loserA" />
-                          <Label htmlFor="loserA" className="cursor-pointer font-medium text-emerald-700">Time A</Label>
+                          <div className="flex items-center space-x-3">
+                            <RadioGroupItem value="teamA" id="winnerA" />
+                            <Label htmlFor="winnerA" className="cursor-pointer font-medium text-emerald-700">Time A</Label>
+                          </div>
+                          <span className="text-sm text-slate-600">
+                            {teamA.length > 0 ? teamA.join(' ') : '—'}
+                          </span>
                         </div>
                         <div
-                          onClick={() => setLoser('teamB')}
-                          className="flex items-center space-x-3 p-4 bg-indigo-50 rounded-xl border-2 border-indigo-200 cursor-pointer"
+                          onClick={() => setWinner('teamB')}
+                          className="flex flex-col justify-center space-y-2 p-4 bg-indigo-50 rounded-xl border-2 border-indigo-200 cursor-pointer"
                         >
-                          <RadioGroupItem value="teamB" id="loserB" />
-                          <Label htmlFor="loserB" className="cursor-pointer font-medium text-indigo-700">Time B</Label>
+                          <div className="flex items-center space-x-3">
+                            <RadioGroupItem value="teamB" id="winnerB" />
+                            <Label htmlFor="winnerB" className="cursor-pointer font-medium text-indigo-700">Time B</Label>
+                          </div>
+                          <span className="text-sm text-slate-600">
+                            {teamB.length > 0 ? teamB.join(' ') : '—'}
+                          </span>
                         </div>
                       </RadioGroup>
                     </motion.div>
