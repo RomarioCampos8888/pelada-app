@@ -36,7 +36,7 @@ export default function TeamCard({ title, players, variant, onRemovePlayer, empt
         <AnimatePresence mode="popLayout">
           {players.length > 0 ? (
             players.map((player, index) => (
-              <div key={player} className="basis-1/2 min-w-0">
+              <div key={player} className="basis-full sm:basis-1/2 min-w-0">
                 <PlayerCard
                   player={player}
                   variant={variant}

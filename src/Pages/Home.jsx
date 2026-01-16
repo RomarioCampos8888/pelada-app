@@ -434,7 +434,7 @@ export default function Home() {
                         key={`${player}-${index}`}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="basis-1/2 min-w-0 flex items-center justify-between p-3 bg-slate-50 rounded-xl"
+                        className="basis-full sm:basis-1/2 min-w-0 flex items-center justify-between p-3 bg-slate-50 rounded-xl"
                       >
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-indigo-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
