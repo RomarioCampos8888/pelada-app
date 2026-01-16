@@ -427,13 +427,13 @@ export default function Home() {
                 </div>
 
                 {players.length > 0 ? (
-                  <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                  <div className="flex flex-wrap gap-2 max-h-[300px] overflow-y-auto">
                     {players.map((player, index) => (
                       <motion.div
                         key={`${player}-${index}`}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center justify-between p-3 bg-slate-50 rounded-xl"
+                        className="basis-1/2 min-w-0 flex items-center justify-between p-3 bg-slate-50 rounded-xl"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-indigo-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
@@ -531,22 +531,24 @@ export default function Home() {
               exit={{ opacity: 0, x: 20 }}
               className="space-y-6"
             >
-              {/* Times */}
-              <div className="grid md:grid-cols-2 gap-4">
-                <TeamCard
-                  title="Time A"
-                  players={teamA}
-                  variant="teamA"
-                  onRemovePlayer={(player, index) => handleRemovePlayer(player, 'teamA', index)}
-                  emptyMessage="Time vazio"
-                />
-                <TeamCard
-                  title="Time B"
-                  players={teamB}
-                  variant="teamB"
-                  onRemovePlayer={(player, index) => handleRemovePlayer(player, 'teamB', index)}
-                  emptyMessage="Time vazio"
-                />
+              {/* Times (sempre lado a lado; rolagem horizontal em telas estreitas) */}
+              <div className="overflow-x-auto -mx-2 px-2">
+                <div className="grid grid-cols-2 gap-4 min-w-[640px]">
+                  <TeamCard
+                    title="Time A"
+                    players={teamA}
+                    variant="teamA"
+                    onRemovePlayer={(player, index) => handleRemovePlayer(player, 'teamA', index)}
+                    emptyMessage="Time vazio"
+                  />
+                  <TeamCard
+                    title="Time B"
+                    players={teamB}
+                    variant="teamB"
+                    onRemovePlayer={(player, index) => handleRemovePlayer(player, 'teamB', index)}
+                    emptyMessage="Time vazio"
+                  />
+                </div>
               </div>
 
               {/* Timer */}
