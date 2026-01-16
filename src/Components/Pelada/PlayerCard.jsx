@@ -24,22 +24,22 @@ export default function PlayerCard({ player, onRemove, variant = 'default', inde
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
       transition={{ delay: index * 0.05 }}
-      className={`flex items-center justify-between p-3 rounded-xl border ${variants[variant]} backdrop-blur-sm`}
+      className={`w-full flex items-center justify-between p-2 sm:p-3 rounded-xl border ${variants[variant]} backdrop-blur-sm`}
     >
-      <div className="flex items-center gap-3">
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${iconVariants[variant]}`}>
-          <User className="w-4 h-4" />
+      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+        <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${iconVariants[variant]}`}>
+          <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </div>
-        <span className="font-medium text-slate-800">{player}</span>
+        <span className="font-medium text-slate-800 whitespace-nowrap md:truncate text-sm sm:text-base" title={player}>{player}</span>
       </div>
       {onRemove && (
         <Button
           variant="ghost"
           size="icon"
           onClick={onRemove}
-          className="h-8 w-8 rounded-full hover:bg-red-100 hover:text-red-600 transition-colors"
+          className="h-7 w-7 sm:h-8 sm:w-8 rounded-full hover:bg-red-100 hover:text-red-600 transition-colors shrink-0"
         >
-          <Minus className="w-4 h-4" />
+          <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </Button>
       )}
     </motion.div>
