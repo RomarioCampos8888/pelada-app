@@ -32,7 +32,7 @@ export default function TeamCard({ title, players, variant, onRemovePlayer, empt
         </div>
       </div>
       
-      <div className="p-4 space-y-2">
+      <div className="p-4 grid grid-cols-2 gap-2">
         <AnimatePresence mode="popLayout">
           {players.length > 0 ? (
             players.map((player, index) => (

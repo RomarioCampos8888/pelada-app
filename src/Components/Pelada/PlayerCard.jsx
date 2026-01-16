@@ -24,7 +24,7 @@ export default function PlayerCard({ player, onRemove, variant = 'default', inde
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
       transition={{ delay: index * 0.05 }}
-      className={`flex items-center justify-between p-3 rounded-xl border ${variants[variant]} backdrop-blur-sm`}
+      className={`w-full flex items-center justify-between p-3 rounded-xl border ${variants[variant]} backdrop-blur-sm`}
     >
       <div className="flex items-center gap-3">
         <div className={`w-8 h-8 rounded-full flex items-center justify-center ${iconVariants[variant]}`}>
