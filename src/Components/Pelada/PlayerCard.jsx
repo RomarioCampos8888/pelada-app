@@ -26,11 +26,11 @@ export default function PlayerCard({ player, onRemove, variant = 'default', inde
       transition={{ delay: index * 0.05 }}
       className={`w-full flex items-center justify-between p-3 rounded-xl border ${variants[variant]} backdrop-blur-sm`}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
         <div className={`w-8 h-8 rounded-full flex items-center justify-center ${iconVariants[variant]}`}>
           <User className="w-4 h-4" />
         </div>
-        <span className="font-medium text-slate-800">{player}</span>
+        <span className="font-medium text-slate-800 truncate">{player}</span>
       </div>
       {onRemove && (
         <Button
