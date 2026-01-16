@@ -617,7 +617,14 @@ export default function Home() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                     >
-                      <Label className="text-slate-700 mb-3 block font-medium">Qual time tem preferência para ficar?</Label>
+                      {queue.length >= playersPerTeam * 2 ? (
+                        <>
+                          <p className="text-slate-700 mb-1 font-medium">Há dois ou mais times na fila, então:</p>
+                          <Label className="text-slate-700 mb-3 block font-medium">Qual time tem preferência na fila?</Label>
+                        </>
+                      ) : (
+                        <Label className="text-slate-700 mb-3 block font-medium">Qual time tem preferência para ficar?</Label>
+                      )}
                       <RadioGroup value={preference} onValueChange={setPreference} className="grid grid-cols-2 gap-3">
                         <div
                           onClick={() => setPreference('teamA')}
