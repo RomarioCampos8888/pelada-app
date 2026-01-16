@@ -440,13 +440,13 @@ export default function Home() {
                           <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-indigo-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
                             {index + 1}
                           </div>
-                          <span className="font-medium text-slate-700 truncate">{player}</span>
+                          <span className="font-medium text-slate-700 whitespace-nowrap md:truncate text-sm sm:text-base" title={player}>{player}</span>
                         </div>
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => removeFromList(index)}
-                          className="h-8 w-8 rounded-full hover:bg-red-100 hover:text-red-600"
+                          className="h-8 w-8 rounded-full hover:bg-red-100 hover:text-red-600 shrink-0"
                         >
                           <Minus className="w-4 h-4" />
                         </Button>
