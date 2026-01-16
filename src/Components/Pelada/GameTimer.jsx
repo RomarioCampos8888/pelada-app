@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Square, Clock, AlertCircle } from 'lucide-react';
+import { Play, Square, Clock, AlertCircle, Pause, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 
@@ -14,23 +14,63 @@ export default function GameTimer({
 }) {
   const [timeRemaining, setTimeRemaining] = useState(null);
   const [isTimeUp, setIsTimeUp] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [pausedStartTime, setPausedStartTime] = useState(null);
+  const [totalPausedTime, setTotalPausedTime] = useState(0);
+  const [adjustedEndTime, setAdjustedEndTime] = useState(endTime);
 
   useEffect(() => {
-    if (!isActive || !endTime) return;
+    setAdjustedEndTime(endTime);
+  }, [endTime]);
+
+  const handlePause = () => {
+    if (!isPaused) {
+      setPausedStartTime(new Date());
+      setIsPaused(true);
+    } else {
+      if (pausedStartTime) {
+        const pauseDuration = new Date() - pausedStartTime;
+        setTotalPausedTime(prev => prev + pauseDuration);
+        
+        // Atualizar horário de fim da partida
+        const newEndTime = new Date(adjustedEndTime);
+        newEndTime.setMilliseconds(newEndTime.getMilliseconds() + pauseDuration);
+        setAdjustedEndTime(newEndTime);
+      }
+      setIsPaused(false);
+      setPausedStartTime(null);
+    }
+  };
+
+  const formatPausedTime = (ms) => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
+
+  const playWhistle = () => {
+    try {
+      // Apito de futebol em base64
+      const whistleAudio = new Audio('data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==');
+      whistleAudio.play().catch(() => {});
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    if (!isActive || !adjustedEndTime) return;
 
     const interval = setInterval(() => {
+      if (isPaused) return;
+
       const now = new Date();
-      const end = new Date(endTime);
+      const end = new Date(adjustedEndTime);
       const diff = end - now;
       
       if (diff <= 0) {
         setTimeRemaining(0);
         setIsTimeUp(true);
-        // Play sound alert
-        try {
-          const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleV0zWr3v47RhGQo/k9bsrnpgMlu56eWvWxsLO5DT5aZxWjNZtuznq1kbCzyP0OChdFo2WLPo5KlXHQs7j87dnnRaN1ew5eGmVR4LO4/O3Z50WjdXsOXhplUeCzuPzt2edFo3V7Dl4aZVHgs7j87dnnRaN1ew5eGmVR4LOo7N25t0WjdXsOXhplUeCzqOzdubdFo3V7Dl4aZVHgs6js3bm3RaN1ew5eGmVR4LOo7N25t0WjdXsOThplUeCzqOzdubdFo3V7Dk4KVVHgs6js3bm3RaN1ew5N+lVR4LOo7N25t0WjdXsOTepFQeCzqOzdubdFo3V6/k3qRUHgs6js3bm3RaN1ev5N2jVB4MOo7N25t0WjdXr+TdolQeDDqOzdubdFo3V6/k3aJUHgw6js3bm3RaN1ev5N2iVB4MOo7N25t0WjdXr+TcolQeDDqOzdubdFo3V6/k3KFUHgw6js3bm3RaN1ev5NugUx4MOY3M2pt0WTZWruPboFMeDDmNzNqbdFk2Vq7j2qBTHgw5jczam3RZNlau49qgUx4MOY3M2pt0WTZWruPaoFMeDDmNzNqbdFk2Vq7j2Z9THgw5jczam3RZNlau49mfUx4MOY3M2pt0WTZWruPZn1MeDDmNzNqbdFk2Vq7j2Z9THgw5jczam3RZNlau49mfUx4MOY3M2pt0WTZWruPZn1MeDDmNzNqbdFk2Vq7j2Z9THgw=');
-          audio.play().catch(() => {});
-        } catch (e) {}
+        playWhistle();
       } else {
         const minutes = Math.floor(diff / 60000);
         const seconds = Math.floor((diff % 60000) / 1000);
@@ -40,7 +80,7 @@ export default function GameTimer({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isActive, endTime]);
+  }, [isActive, adjustedEndTime, isPaused]);
 
   return (
     <motion.div
@@ -75,13 +115,20 @@ export default function GameTimer({
                 {startTime ? format(new Date(startTime), 'HH:mm') : '--:--'}
               </p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-3">
+            <div className={`rounded-xl p-3 ${isPaused ? 'bg-orange-50' : 'bg-slate-50'}`}>
               <p className="text-xs text-slate-500 uppercase tracking-wide">Fim Previsto</p>
               <p className="text-lg font-bold text-slate-800">
-                {endTime ? format(new Date(endTime), 'HH:mm') : '--:--'}
+                {adjustedEndTime ? format(new Date(adjustedEndTime), 'HH:mm') : '--:--'}
               </p>
             </div>
           </div>
+
+          {totalPausedTime > 0 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center">
+              <p className="text-xs text-blue-600 uppercase tracking-wide font-semibold">Tempo Total Pausado</p>
+              <p className="text-xl font-bold text-blue-700">{formatPausedTime(totalPausedTime)}</p>
+            </div>
+          )}
 
           {timeRemaining !== null && (
             <motion.div
@@ -90,6 +137,8 @@ export default function GameTimer({
               className={`text-center py-4 rounded-xl ${
                 isTimeUp 
                   ? 'bg-red-100 border-2 border-red-300' 
+                  : isPaused
+                  ? 'bg-orange-100 border-2 border-orange-300'
                   : 'bg-gradient-to-r from-emerald-50 to-indigo-50'
               }`}
             >
@@ -97,6 +146,14 @@ export default function GameTimer({
                 <div className="flex items-center justify-center gap-2 text-red-600">
                   <AlertCircle className="w-6 h-6" />
                   <span className="text-2xl font-bold">Tempo Esgotado!</span>
+                </div>
+              ) : isPaused ? (
+                <div className="flex flex-col items-center gap-1">
+                  <p className="text-sm text-orange-600 font-semibold">Partida Pausada</p>
+                  <p className="text-3xl font-bold text-orange-700">
+                    {String(timeRemaining.minutes).padStart(2, '0')}:
+                    {String(timeRemaining.seconds).padStart(2, '0')}
+                  </p>
                 </div>
               ) : (
                 <>
@@ -110,14 +167,36 @@ export default function GameTimer({
             </motion.div>
           )}
 
-          <Button 
-            onClick={onEnd}
-            variant="outline"
-            className="w-full py-3 rounded-xl font-semibold border-2 border-slate-300 hover:bg-slate-100"
-          >
-            <Square className="w-4 h-4 mr-2" />
-            Encerrar Partida
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={handlePause}
+              className={`flex-1 py-3 rounded-xl font-semibold ${
+                isPaused
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white'
+                  : 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white'
+              }`}
+            >
+              {isPaused ? (
+                <>
+                  <Play className="w-5 h-5 mr-2" />
+                  Retomar
+                </>
+              ) : (
+                <>
+                  <Pause className="w-5 h-5 mr-2" />
+                  Pausar
+                </>
+              )}
+            </Button>
+            <Button 
+              onClick={onEnd}
+              variant="outline"
+              className="flex-1 py-3 rounded-xl font-semibold border-2 border-slate-300 hover:bg-slate-100"
+            >
+              <Square className="w-4 h-4 mr-2" />
+              Encerrar
+            </Button>
+          </div>
         </div>
       )}
     </motion.div>
