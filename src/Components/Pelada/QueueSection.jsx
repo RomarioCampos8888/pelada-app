@@ -78,15 +78,16 @@ export default function QueueSection({
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                     {blockIndex + 1}º Próximos a entrar
                   </p>
-                  <div className="space-y-2">
+                  <div className="flex flex-wrap gap-2">
                     {block.map((player, playerIndex) => (
-                      <PlayerCard
-                        key={player}
-                        player={player}
-                        variant="queue"
-                        index={playerIndex}
-                        onRemove={() => onRemovePlayer(blockIndex * playersPerTeam + playerIndex)}
-                      />
+                      <div key={player} className="basis-1/2 min-w-0">
+                        <PlayerCard
+                          player={player}
+                          variant="queue"
+                          index={playerIndex}
+                          onRemove={() => onRemovePlayer(blockIndex * playersPerTeam + playerIndex)}
+                        />
+                      </div>
                     ))}
                   </div>
                 </motion.div>

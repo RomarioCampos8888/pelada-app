@@ -22,6 +22,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from 'sonner';
 
 import TeamCard from '@/Components/Pelada/TeamCard';
+import PlayerCard from '@/Components/Pelada/PlayerCard';
 import GameTimer from '@/Components/Pelada/GameTimer';
 import QueueSection from '@/Components/Pelada/QueueSection';
 import ConfirmDialog from '@/Components/Pelada/ConfirmDialog';
@@ -532,22 +533,26 @@ export default function Home() {
               className="space-y-6"
             >
               {/* Times (sempre lado a lado; rolagem horizontal em telas estreitas) */}
-              <div className="overflow-x-auto -mx-2 px-2">
-                <div className="grid grid-cols-2 gap-4 min-w-[640px]">
-                  <TeamCard
-                    title="Time A"
-                    players={teamA}
-                    variant="teamA"
-                    onRemovePlayer={(player, index) => handleRemovePlayer(player, 'teamA', index)}
-                    emptyMessage="Time vazio"
-                  />
-                  <TeamCard
-                    title="Time B"
-                    players={teamB}
-                    variant="teamB"
-                    onRemovePlayer={(player, index) => handleRemovePlayer(player, 'teamB', index)}
-                    emptyMessage="Time vazio"
-                  />
+              <div className="overflow-x-auto -mx-2 px-2 snap-x snap-mandatory scrollbar-none">
+                <div className="grid grid-cols-2 gap-4 min-w-[700px]">
+                  <div className="snap-start">
+                    <TeamCard
+                      title="Time A"
+                      players={teamA}
+                      variant="teamA"
+                      onRemovePlayer={(player, index) => handleRemovePlayer(player, 'teamA', index)}
+                      emptyMessage="Time vazio"
+                    />
+                  </div>
+                  <div className="snap-start">
+                    <TeamCard
+                      title="Time B"
+                      players={teamB}
+                      variant="teamB"
+                      onRemovePlayer={(player, index) => handleRemovePlayer(player, 'teamB', index)}
+                      emptyMessage="Time vazio"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -685,6 +690,33 @@ export default function Home() {
                   </Button>
                 </div>
               </div>
+
+              {/* Próximos da Fila (resumo) */}
+              {queue.length > 0 && (
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-lg p-6">
+                  <h3 className="text-lg font-bold text-slate-800 mb-4">Próximos da Fila</h3>
+                  <div className="space-y-3">
+                    {Array.from({ length: Math.ceil(queue.length / playersPerTeam) }).map((_, blockIndex) => {
+                      const start = blockIndex * playersPerTeam;
+                      const block = queue.slice(start, start + playersPerTeam);
+                      return (
+                        <div key={blockIndex} className="bg-slate-50 rounded-xl p-3">
+                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+                            {blockIndex + 1}º Próximos a entrar
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {block.map((player, playerIndex) => (
+                              <div key={player} className="basis-1/2 min-w-0">
+                                <PlayerCard player={player} variant="queue" index={playerIndex} />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <Button
                 onClick={handleEndAll}
