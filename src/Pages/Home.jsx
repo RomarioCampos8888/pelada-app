@@ -434,10 +434,10 @@ export default function Home() {
                         key={`${player}-${index}`}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="basis-full sm:basis-1/2 min-w-0 flex items-center justify-between p-3 bg-slate-50 rounded-xl"
+                        className="basis-full sm:basis-1/2 min-w-0 flex items-center justify-between p-2 sm:p-3 bg-slate-50 rounded-xl"
                       >
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-indigo-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-emerald-400 to-indigo-400 rounded-full flex items-center justify-center text-white font-bold text-[10px] sm:text-sm">
                             {index + 1}
                           </div>
                           <span className="font-medium text-slate-700 whitespace-nowrap md:truncate text-sm sm:text-base" title={player}>{player}</span>
@@ -446,9 +446,9 @@ export default function Home() {
                           variant="ghost"
                           size="icon"
                           onClick={() => removeFromList(index)}
-                          className="h-8 w-8 rounded-full hover:bg-red-100 hover:text-red-600 shrink-0"
+                          className="h-7 w-7 sm:h-8 sm:w-8 rounded-full hover:bg-red-100 hover:text-red-600 shrink-0"
                         >
-                          <Minus className="w-4 h-4" />
+                          <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </Button>
                       </motion.div>
                     ))}
