@@ -2,6 +2,33 @@
 
 This project uses Capacitor and the Android native project is under `android/`.
 
+## Ionic Appflow (APK and AAB)
+
+Appflow's Capacitor native build runs `npm run build` when the package script is
+present, then runs `npx cap sync android` before building the native project.
+This repository already has the required `build` script, Capacitor config, and
+Android project.
+
+1. Connect the Git repository to an Appflow app and start a native Android build
+  from the commit you want to package.
+2. Select an Android build stack that includes JDK 21 and Android SDK 36 or
+  newer. The project uses Android Gradle Plugin 8.13.0, Gradle 8.14.3, and
+  `compileSdkVersion` 36.
+3. For a signed release build, register a Production Android signing
+  certificate in Appflow. Reuse the existing Play signing key if this app has
+  already been published; never commit the keystore or passwords to Git.
+4. Choose the Android `release` build type and request APK, AAB, or both. Appflow
+  makes the generated files available as build artifacts. Debug builds do not
+  require a signing certificate.
+
+Appflow references:
+- [Native Builds](https://ionic.io/docs/appflow/package/builds)
+- [Android Build Types](https://ionic.io/docs/appflow/package/build-types)
+- [Build Stacks](https://ionic.io/docs/appflow/build-stacks)
+
+The GitHub Actions signing instructions below are separate; their secrets are
+not automatically available to Appflow.
+
 To build a signed release APK in CI you need to:
 
 1. Create a Java keystore (.jks or .keystore) locally using keytool:
