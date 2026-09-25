@@ -532,28 +532,22 @@ export default function Home() {
               exit={{ opacity: 0, x: 20 }}
               className="space-y-6"
             >
-              {/* Times (sempre lado a lado; rolagem horizontal em telas estreitas) */}
-              <div className="overflow-x-auto -mx-2 px-2 snap-x snap-mandatory scrollbar-none">
-                <div className="grid grid-cols-2 gap-4 min-w-[700px]">
-                  <div className="snap-start">
-                    <TeamCard
-                      title="Time A"
-                      players={teamA}
-                      variant="teamA"
-                      onRemovePlayer={(player, index) => handleRemovePlayer(player, 'teamA', index)}
-                      emptyMessage="Time vazio"
-                    />
-                  </div>
-                  <div className="snap-start">
-                    <TeamCard
-                      title="Time B"
-                      players={teamB}
-                      variant="teamB"
-                      onRemovePlayer={(player, index) => handleRemovePlayer(player, 'teamB', index)}
-                      emptyMessage="Time vazio"
-                    />
-                  </div>
-                </div>
+              {/* Times empilhados para manter os dois visíveis sem rolagem horizontal */}
+              <div className="space-y-4">
+                <TeamCard
+                  title="Time A"
+                  players={teamA}
+                  variant="teamA"
+                  onRemovePlayer={(player, index) => handleRemovePlayer(player, 'teamA', index)}
+                  emptyMessage="Time vazio"
+                />
+                <TeamCard
+                  title="Time B"
+                  players={teamB}
+                  variant="teamB"
+                  onRemovePlayer={(player, index) => handleRemovePlayer(player, 'teamB', index)}
+                  emptyMessage="Time vazio"
+                />
               </div>
 
               {/* Timer */}
