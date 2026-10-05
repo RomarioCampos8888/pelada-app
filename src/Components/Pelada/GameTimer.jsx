@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { Play, Square, Clock, AlertCircle, Pause, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -86,13 +87,13 @@ export default function GameTimer({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl border border-slate-200 shadow-lg p-6"
+      className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg p-3 sm:p-6"
     >
-      <div className="flex items-center gap-3 mb-4">
-        <div className="bg-amber-100 rounded-full p-2">
-          <Clock className="w-5 h-5 text-amber-600" />
+      <div className="flex items-center gap-2 mb-3 sm:gap-3 sm:mb-4">
+        <div className="bg-amber-100 rounded-full p-1.5 sm:p-2">
+          <Clock className="w-4 h-4 text-amber-600 sm:w-5 sm:h-5" />
         </div>
-        <h3 className="font-bold text-slate-800 text-lg">Tempo da Partida</h3>
+        <h3 className="font-bold text-slate-800 text-base sm:text-lg">Tempo da Partida</h3>
       </div>
 
       {!isActive ? (
@@ -100,22 +101,22 @@ export default function GameTimer({
           <p className="text-slate-500 mb-4">Duração: {duration} minutos</p>
           <Button 
             onClick={onStart}
-            className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-8 py-3 rounded-xl font-semibold"
+            className="min-h-11 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-8 py-3 rounded-xl font-semibold"
           >
             <Play className="w-5 h-5 mr-2" />
             Iniciar Partida
           </Button>
         </div>
       ) : (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div className="bg-slate-50 rounded-xl p-3">
+        <div className="space-y-2 sm:space-y-4">
+          <div className="grid grid-cols-2 gap-2 text-center sm:gap-4">
+            <div className="bg-slate-50 rounded-lg sm:rounded-xl p-2 sm:p-3">
               <p className="text-xs text-slate-500 uppercase tracking-wide">Início</p>
               <p className="text-lg font-bold text-slate-800">
                 {startTime ? format(new Date(startTime), 'HH:mm') : '--:--'}
               </p>
             </div>
-            <div className={`rounded-xl p-3 ${isPaused ? 'bg-orange-50' : 'bg-slate-50'}`}>
+            <div className={`rounded-lg sm:rounded-xl p-2 sm:p-3 ${isPaused ? 'bg-orange-50' : 'bg-slate-50'}`}>
               <p className="text-xs text-slate-500 uppercase tracking-wide">Fim Previsto</p>
               <p className="text-lg font-bold text-slate-800">
                 {adjustedEndTime ? format(new Date(adjustedEndTime), 'HH:mm') : '--:--'}
@@ -124,7 +125,7 @@ export default function GameTimer({
           </div>
 
           {totalPausedTime > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg sm:rounded-xl p-2 sm:p-3 text-center">
               <p className="text-xs text-blue-600 uppercase tracking-wide font-semibold">Tempo Total Pausado</p>
               <p className="text-xl font-bold text-blue-700">{formatPausedTime(totalPausedTime)}</p>
             </div>
@@ -134,7 +135,7 @@ export default function GameTimer({
             <motion.div
               animate={isTimeUp ? { scale: [1, 1.05, 1] } : {}}
               transition={{ repeat: isTimeUp ? Infinity : 0, duration: 0.5 }}
-              className={`text-center py-4 rounded-xl ${
+              className={`text-center py-3 sm:py-4 rounded-lg sm:rounded-xl ${
                 isTimeUp 
                   ? 'bg-red-100 border-2 border-red-300' 
                   : isPaused
@@ -158,7 +159,7 @@ export default function GameTimer({
               ) : (
                 <>
                   <p className="text-sm text-slate-500 mb-1">Tempo Restante</p>
-                  <p className="text-4xl font-bold text-slate-800">
+                  <p className="text-3xl sm:text-4xl font-bold text-slate-800">
                     {String(timeRemaining.minutes).padStart(2, '0')}:
                     {String(timeRemaining.seconds).padStart(2, '0')}
                   </p>
@@ -170,7 +171,7 @@ export default function GameTimer({
           <div className="flex gap-2">
             <Button 
               onClick={handlePause}
-              className={`flex-1 py-3 rounded-xl font-semibold ${
+              className={`min-h-11 flex-1 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold ${
                 isPaused
                   ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white'
                   : 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white'
@@ -191,13 +192,58 @@ export default function GameTimer({
             <Button 
               onClick={onEnd}
               variant="outline"
-              className="flex-1 py-3 rounded-xl font-semibold border-2 border-slate-300 hover:bg-slate-100"
+              className="min-h-11 flex-1 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold border-2 border-slate-300 hover:bg-slate-100"
             >
               <Square className="w-4 h-4 mr-2" />
               Encerrar
             </Button>
           </div>
         </div>
+      )}
+
+      {typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-3 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] shadow-[0_-4px_16px_rgba(15,23,42,0.12)] backdrop-blur sm:px-4 md:hidden"
+          role="region"
+          aria-label="Controles da partida"
+        >
+          {isActive ? (
+            <div className="mx-auto flex max-w-lg items-center justify-between gap-3">
+              <div aria-live="polite" className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                  {isPaused ? 'Partida pausada' : 'Tempo restante'}
+                </p>
+                <p className={`text-2xl font-bold leading-tight ${isTimeUp ? 'text-red-600' : isPaused ? 'text-orange-600' : 'text-slate-800'}`}>
+                  {isTimeUp
+                    ? '00:00'
+                    : timeRemaining
+                      ? `${String(timeRemaining.minutes).padStart(2, '0')}:${String(timeRemaining.seconds).padStart(2, '0')}`
+                      : '--:--'}
+                </p>
+              </div>
+              <Button
+                onClick={handlePause}
+                className={`min-h-11 min-w-32 rounded-xl px-4 font-semibold text-white ${
+                  isPaused
+                    ? 'bg-blue-600 hover:bg-blue-700'
+                    : 'bg-orange-600 hover:bg-orange-700'
+                }`}
+              >
+                {isPaused ? <Play className="mr-2 h-4 w-4" /> : <Pause className="mr-2 h-4 w-4" />}
+                {isPaused ? 'Retomar' : 'Pausar'}
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={onStart}
+              className="mx-auto flex min-h-12 w-full max-w-lg rounded-xl bg-emerald-600 font-semibold text-white hover:bg-emerald-700"
+            >
+              <Play className="mr-2 h-5 w-5" />
+              Iniciar próxima partida
+            </Button>
+          )}
+        </div>,
+        document.body
       )}
     </motion.div>
   );

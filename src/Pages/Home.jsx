@@ -58,6 +58,7 @@ export default function Home() {
   
   // Confirmação de remoção
   const [confirmRemove, setConfirmRemove] = useState(null);
+  const [confirmEndMatch, setConfirmEndMatch] = useState(false);
   
   // Resultado
   const [resultType, setResultType] = useState('draw');
@@ -195,6 +196,15 @@ export default function Home() {
     setScreen(3);
   };
 
+  const requestEndMatch = () => {
+    setConfirmEndMatch(true);
+  };
+
+  const confirmEndCurrentMatch = () => {
+    setConfirmEndMatch(false);
+    handleEndMatch();
+  };
+
   const handleConfirmResult = () => {
     if (resultType === 'draw') {
       // Verificar se há 2 ou mais times completos na fila
@@ -320,13 +330,25 @@ export default function Home() {
   };
 
   const removeFromQueue = (index) => {
+    const player = queue[index];
     setQueue(prev => prev.filter((_, i) => i !== index));
+    toast(`${player} removido da fila.`, {
+      action: {
+        label: 'Desfazer',
+        onClick: () => setQueue(prev => [
+          ...prev.slice(0, Math.min(index, prev.length)),
+          player,
+          ...prev.slice(Math.min(index, prev.length))
+        ])
+      },
+      duration: 5000
+    });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
       {/* Header */}
-      <header className="bg-gradient-to-r from-emerald-600 to-indigo-600 text-white py-6 px-4 shadow-lg">
+      <header className="bg-gradient-to-r from-emerald-600 to-indigo-600 text-white py-3 px-3 shadow-lg sm:py-6 sm:px-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -341,10 +363,10 @@ export default function Home() {
                 </Button>
               )}
               <div>
-                <h1 className="text-2xl font-bold flex items-center gap-2">
+                <h1 className="text-lg font-bold flex items-center gap-2 sm:text-2xl">
                   ⚽ Pelada Top
                 </h1>
-                <p className="text-white/80 text-sm">
+                <p className="text-white/80 text-xs sm:text-sm">
                   {screen === 1 && 'Organize sua pelada'}
                   {screen === 2 && 'Partida em andamento'}
                   {screen === 3 && 'Resultado da partida'}
@@ -354,14 +376,14 @@ export default function Home() {
             {screen === 2 && (
               <div className="text-right">
                 <p className="text-xs text-white/60 uppercase tracking-wide">Jogadores</p>
-                <p className="text-xl font-bold">{teamA.length + teamB.length + queue.length}</p>
+                <p className="text-lg font-bold sm:text-xl">{teamA.length + teamB.length + queue.length}</p>
               </div>
             )}
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto p-4 pb-24">
+      <main className="max-w-4xl mx-auto p-2 pb-32 sm:p-4 sm:pb-24">
         <AnimatePresence mode="wait">
           {/* TELA 1 - CADASTRO */}
           {screen === 1 && (
@@ -370,7 +392,7 @@ export default function Home() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              className="space-y-6"
+              className="space-y-3 sm:space-y-6"
             >
               {/* Adicionar jogador */}
               <div className="bg-white rounded-2xl border border-slate-200 shadow-lg p-6">
@@ -533,7 +555,7 @@ export default function Home() {
               className="space-y-6"
             >
               {/* Times empilhados para manter os dois visíveis sem rolagem horizontal */}
-              <div className="space-y-4">
+              <div className="space-y-2 sm:space-y-4">
                 <TeamCard
                   title="Time A"
                   players={teamA}
@@ -557,7 +579,7 @@ export default function Home() {
                 startTime={startTime}
                 endTime={endTime}
                 onStart={handleStartMatch}
-                onEnd={handleEndMatch}
+                onEnd={requestEndMatch}
               />
 
               {/* Fila */}
@@ -740,6 +762,16 @@ export default function Home() {
         onCancel={() => setConfirmRemove(null)}
         confirmText="Confirmar"
         cancelText="Cancelar"
+      />
+      <ConfirmDialog
+        isOpen={confirmEndMatch}
+        title="Encerrar partida?"
+        message="A partida será finalizada e você poderá registrar o resultado. Deseja continuar?"
+        onConfirm={confirmEndCurrentMatch}
+        onCancel={() => setConfirmEndMatch(false)}
+        confirmText="Encerrar partida"
+        cancelText="Continuar jogando"
+        variant="danger"
       />
     </div>
   );

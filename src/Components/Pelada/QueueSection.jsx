@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Plus, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,11 +12,14 @@ export default function QueueSection({
   onRemovePlayer 
 }) {
   const [newPlayer, setNewPlayer] = useState('');
+  const inputRef = useRef(null);
 
-  const handleAddPlayer = () => {
+  const handleAddPlayer = (event) => {
+    event.preventDefault();
     if (newPlayer.trim()) {
       onAddPlayer(newPlayer.trim());
       setNewPlayer('');
+      inputRef.current?.focus();
     }
   };
 
@@ -30,37 +33,40 @@ export default function QueueSection({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl border border-slate-200 shadow-lg overflow-hidden"
+      className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg overflow-hidden"
     >
-      <div className="bg-gradient-to-r from-slate-600 to-slate-700 p-4">
-        <div className="flex items-center gap-3">
-          <div className="bg-white/20 rounded-full p-2">
-            <Users className="w-5 h-5 text-white" />
+      <div className="bg-gradient-to-r from-slate-600 to-slate-700 p-3 sm:p-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="bg-white/20 rounded-full p-1.5 sm:p-2">
+            <Users className="w-4 h-4 text-white sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h3 className="text-white font-bold text-lg">Fila de Espera</h3>
-            <p className="text-white/80 text-sm">{queue.length} jogadores aguardando</p>
+            <h3 className="text-white font-bold text-base sm:text-lg">Fila de Espera</h3>
+            <p className="text-white/80 text-xs sm:text-sm">{queue.length} jogadores aguardando</p>
           </div>
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
         {/* Adicionar jogador */}
-        <div className="flex gap-2">
+        <form onSubmit={handleAddPlayer} className="flex gap-2">
           <Input
+            ref={inputRef}
+            type="text"
+            aria-label="Nome do jogador para adicionar à fila"
             placeholder="Nome do jogador..."
             value={newPlayer}
             onChange={(e) => setNewPlayer(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleAddPlayer()}
-            className="flex-1 rounded-xl border-slate-200"
+            className="min-h-11 flex-1 rounded-xl border-slate-200"
           />
-          <Button 
-            onClick={handleAddPlayer}
-            className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 rounded-xl px-4"
+          <Button
+            type="submit"
+            aria-label="Adicionar jogador à fila"
+            className="min-h-11 min-w-11 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 rounded-xl px-3 sm:px-4"
           >
             <UserPlus className="w-5 h-5" />
           </Button>
-        </div>
+        </form>
 
         {/* Blocos da fila */}
         <div className="space-y-4">
@@ -73,14 +79,14 @@ export default function QueueSection({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ delay: blockIndex * 0.1 }}
-                  className="bg-slate-50 rounded-xl p-3"
+                  className="bg-slate-50 rounded-lg sm:rounded-xl p-2.5 sm:p-3"
                 >
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                     {blockIndex + 1}º Próximos a entrar
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {block.map((player, playerIndex) => (
-                      <div key={player} className="basis-1/2 min-w-0">
+                      <div key={player} className="basis-[calc(50%-0.1875rem)] min-w-0">
                         <PlayerCard
                           player={player}
                           variant="queue"
