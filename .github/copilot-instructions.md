@@ -1,43 +1,121 @@
+## Instruções práticas para agentes de código (Copilot)
+
+Este projeto é uma SPA em React + Vite com Tailwind, PWA via `vite-plugin-pwa` e empacotamento Android com Capacitor. Foque em produtividade imediata com estes pontos-chave.
+
+- **Arquitetura (big picture):**
+  - Entrada em `src/main.jsx` (React.StrictMode + registro PWA `virtual:pwa-register`). Alias `@` aponta para `src` (ver `vite.config.js`).
+  - Sem store global: `src/Pages/Home.jsx` é a única fonte de verdade; estado flui por props. Decisão prioriza simplicidade, previsibilidade e persistência local para uso offline/mobile.
+  - Separação de camadas: primitives em `src/components/ui/*`; domínio da pelada em `src/Components/Pelada/*` (PascalCase).
+
+- **Estado e dados:**
+  - Persistência em `localStorage` com prefixo `pelada_*` (ex.: `pelada_players`, `pelada_teamA`, `pelada_queue`, `pelada_isMatchActive`), lido/escrito via `useEffect` em `Home.jsx`.
+  - `players` são strings (nomes). `src/Entities/Player.js` não é usado hoje; se evoluir para objetos, alinhe cadastro e componentes para converter corretamente.
+
+- **Fluxo funcional (3 telas):**
+  - Cadastro: adiciona jogadores (manual/lista), define `playersPerTeam` e `matchDuration`; distribuição inicial feita por `distributeInitial()` (Time A/B + fila).
+  - Partida: `GameTimer` controla tempo (usa `date-fns`; pausa ajusta `adjustedEndTime`; apito base64 ao terminar). `TeamCard`/`PlayerCard` variam por `variant` (`teamA`, `teamB`, `queue`). `QueueSection` organiza a `queue` em blocos de `playersPerTeam` e expõe `onAddPlayer`/`onRemovePlayer`.
+  - Resultado: empate com preferência (mantém equilíbrio), vitória envia perdedor à fila. Regras de reordenação estão centralizadas em `Home.jsx`.
+
+- **Padrões de componentes:**
+  - Primitives (`button.jsx`, `input.jsx`, `slider.jsx`, `radio-group.jsx`) são simples e reutilizáveis; estilize com Tailwind e evite CSS inline complexo.
+  - Interações propagam via callbacks: `onRemove`, `onRemovePlayer`, `onAddPlayer` (veja `TeamCard.jsx`, `PlayerCard.jsx`, `QueueSection.jsx`).
+
+- **Workflows de desenvolvimento:**
+  - Dev: `npm run dev` (Vite em 5173, `host: true`). Build web: `npm run build`. Preview: `npm run preview` (4173).
+  - Recursos Android: `npm run generate:resources` (ícones/splash) e `npx cap sync android`. Abrir projeto nativo: `npx cap open android`. Config em `capacitor.config.json`; código nativo em `android/app/`.
+
+- **Integrações e libs:**
+  - `framer-motion` (animações), `lucide-react` (ícones), `sonner` (toasts), `date-fns` (datas). PWA com `vite-plugin-pwa` (`registerType: autoUpdate`; manifest e configuração em `vite.config.js`).
+
+- **Convenções locais:**
+  - `src/components` (lowercase, primitives) vs `src/Components` (PascalCase, domínio). Use o alias `@` nos imports.
+  - Ao mudar APIs de componentes, atualize usos em `src/Pages/Home.jsx` e `src/Components/Pelada/*`.
+  - README raiz está desatualizado (Streamlit); confie neste guia e no código.
+
+- **Dicas de debug:**
+  - Timer/pausa: veja `src/Components/Pelada/GameTimer.jsx` (cálculo de `adjustedEndTime` e término).
+  - Fila/times: veja `src/Components/Pelada/QueueSection.jsx` (blocos por `playersPerTeam`) e `src/Components/Pelada/TeamCard.jsx`.
+  - Mobile: `src/hooks/useWakeLock.js` mantém a tela ativa durante a partida.
+
+- **Referências rápidas:**
+  - `src/Pages/Home.jsx` (estados, persistência e regras).
+  - `src/Components/Pelada/GameTimer.jsx` (timer e pausa).
+  - `src/Components/Pelada/QueueSection.jsx` (fila por blocos).
+  - `vite.config.js` (alias `@`, PWA, portas).
+
+### Exemplos curtos
+
+- Wake Lock (mobile):
+
+```jsx
+import { useWakeLock } from '@/hooks/useWakeLock'
+
+export function MatchView() {
+  useWakeLock();
+  // ... render de TeamCard, GameTimer e QueueSection
+}
+```
+
+- RadioGroup (primitives):
+
+```jsx
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+
+<RadioGroup value={preference} onValueChange={setPreference}>
+  <RadioGroupItem value="teamA" />
+  <RadioGroupItem value="teamB" />
+</RadioGroup>
+```
+
+Se algo estiver pouco claro ou faltar um fluxo específico, me diga o que complementar (ex.: regras detalhadas de empate/vitória, sequência de distribuição inicial, ou checklist para alterações em `Home.jsx`).
 ## Instruções rápidas para agentes de código (Copilot)
 
-Este repositório é uma aplicação frontend em React + Vite com Tailwind. Use este documento para entender convenções, comandos e pontos importantes do projeto antes de alterar código.
+Este repo é uma SPA em React + Vite com Tailwind e empacotamento mobile via Capacitor. Abaixo, o essencial para agir com segurança e produtividade neste código.
 
-- **Visão geral:** entrada em `src/main.jsx` via Vite; estilos em `index.css` usando Tailwind; componentes estão em `src/components` e `src/Components` (veja nota sobre pastas duplicadas abaixo). Funcionalidade principal relacionada a "pelada" está em `src/Components/Pelada`.
+- **Arquitetura e entrada:**
+  - `src/main.jsx` inicializa a app, aplica `React.StrictMode` e registra PWA via `virtual:pwa-register` (plugin `vite-plugin-pwa`). Alias `@` aponta para `src` (ver `vite.config.js`).
+  - UI primitives em `src/components/ui/*` (controles simples: `button.jsx`, `input.jsx`, `slider.jsx`, `radio-group.jsx`). Domínio “Pelada” em `src/Components/Pelada/*` (PascalCase).
+  - Estilos globais em `src/index.css` com Tailwind; classe utilitária `scrollbar-none` já definida.
 
-- **Comandos úteis:**
-  - Desenvolvimento: `npm run dev` (inicia Vite localmente)
-  - Build: `npm run build`
-  - Preview: `npm run preview`
+- **Estado e dados (importante):**
+  - Não há store global. O estado vive em `src/Pages/Home.jsx` e flui via props para componentes.
+  - Persistência no `localStorage` com chaves prefixadas `pelada_*` (ex.: `pelada_players`, `pelada_teamA`, `pelada_queue`, `pelada_isMatchActive`). Leitura/escrita feita por múltiplos `useEffect` em `Home.jsx`.
+  - `players` são strings (nomes). O arquivo `src/Entities/Player.js` é um schema simples e não é utilizado atualmente; se evoluir para objetos, alinhe conversões no cadastro e nos componentes.
 
-- **Dependências importantes:** `react`, `vite`, `tailwindcss`, `framer-motion`, `lucide-react`, `sonner`, `date-fns`, `class-variance-authority`, `tailwind-variants`.
+- **Fluxo funcional (3 telas):**
+  - Tela 1 (Cadastro): adiciona jogadores (manual ou lista), define `playersPerTeam` e `matchDuration`; distribui times e fila via `distributeInitial()`.
+  - Tela 2 (Partida): exibe `TeamCard` A/B, controla tempo com `GameTimer` (pausa ajusta `endTime`), gerencia `QueueSection` em blocos do tamanho do time.
+  - Tela 3 (Resultado): registra empate/vitória e reordena times/fila conforme lógica em `Home.jsx` (preferência no empate; perdedor vai para fila na vitória).
 
-- **Arquitetura / padrões:**
-  - UI: pequena biblioteca de primitives em `src/components/ui` (ex.: `button.jsx`, `input.jsx`, `label.jsx`, `radio-group.jsx`, `slider.jsx`, `textarea.jsx`). Reutilize essas primitives para manter consistência de estilos e acessibilidade.
-  - Área de domínio "Pelada": `src/Components/Pelada/*` contém `ConfirmDialog.jsx`, `GameTimer.jsx`, `PlayerCard.jsx`, `QueueSection.jsx`, `TeamCard.jsx`. Essas componentes orquestram fluxo de jogo/filas.
-  - Entidades: `src/Entities/Player.js` contém a modelagem de jogador. Prefira transformar lógica complexa de estado em funções puras reutilizáveis embora ainda mantenha UI em componentes React.
+- **Componentes de domínio (padrões):**
+  - `GameTimer.jsx`: usa `date-fns` e ajusta `adjustedEndTime` ao pausar; apito base64 ao terminar.
+  - `QueueSection.jsx`: divide `queue` em blocos (`playersPerTeam`) e expõe `onAddPlayer`/`onRemovePlayer`.
+  - `TeamCard.jsx` e `PlayerCard.jsx`: variam estilo por `variant` (`teamA`, `teamB`, `queue`) e propagam `onRemove`/`onRemovePlayer`.
+  - Hook `src/hooks/useWakeLock.js`: mantém tela ativa; considere usar junto ao timer em contextos mobile.
 
-- **Convensões do projeto:**
-  - Nomes de arquivos de componentes React usam PascalCase quando na pasta `Components/` e lowercase/short-names em `components/ui`. Observe a existência de duas pastas c/ convenções diferentes — verifique qual pasta o recurso deve viver antes de criar novos arquivos.
-  - Estilos: use classes Tailwind; quando precisar de variantes reutilizáveis, use `tailwind-variants` e `class-variance-authority` como no código existente.
-  - Efeitos/Animações: use `framer-motion` para animações de componentes já existentes.
+- **Comandos e execução (validados):**
+  - Dev: `npm run dev` (Vite em `5173`, `host: true`).
+  - Build web: `npm run build` (saída em `dist`). Preview: `npm run preview` (`4173`).
+  - Mobile assets: `npm run generate:resources` (gera ícones/splash e `npx cap sync android`).
 
-- **Padrões de interação entre componentes:**
-  - Os componentes principais da Pelada delegam estado para componentes filhos via props; não há um gerenciador global óbvio (Redux/MobX). Se precisar de estado compartilhado, prefira hooks locais ou Context API leve.
+- **Android (Capacitor):**
+  - `capacitor.config.json` define `appId/appName/webDir`.
+  - Fluxo típico: `npm run build` → `npx cap copy android` (ou `sync` via script) → `npx cap open android`. Código nativo em `android/app/`.
 
-- **Integrações externas:**
-  - Bibliotecas de UI: `lucide-react` para ícones; `sonner` para toasts/feedback.
-  - Sem backend explícito no repositório: verifique se integrações externas (API) existem fora do repositório antes de implementá-las.
+- **Integrações e libs:**
+  - `framer-motion` para animações; `lucide-react` ícones; `sonner` toasts; `date-fns` formatação.
+  - PWA via `vite-plugin-pwa` com `registerType: autoUpdate` e manifest em `vite.config.js`.
 
-- **O que evitar/observar:**
-  - `README.md` contém conteúdo que parece ser de um projeto Streamlit Python — está desatualizado em relação ao código atual. Não confie em seu conteúdo para arquitetura do frontend; priorize o código em `src/`.
-  - Há duas pastas similares: `src/components` e `src/Components`. Antes de criar um novo componente, confirme qual convenção a base do projeto espera para a área que você está mudando.
+- **Convenções e cuidados:**
+  - Respeite os dois diretórios de componentes: `src/components` (primitives, lowercase) vs `src/Components` (domínio, PascalCase).
+  - Reutilize primitives; evite estilos inline complexos — prefira Tailwind.
+  - README atual está desatualizado (Streamlit). Confie neste documento e no código.
+  - Ao mudar APIs de componentes, atualize chamadas em `src/Pages/Home.jsx` e `src/Components/Pelada/*`.
 
-- **Exemplos específicos para alterações:**
-  - Para alterar a inicialização, edite `src/main.jsx`.
-  - Para novos componentes de UI reutilizáveis, adicione em `src/components/ui` seguindo os patterns existentes (`button.jsx` e `input.jsx`).
-  - Para lógica de jogo (fila, substituições, timer), prefira modificar/estender `src/Components/Pelada/*` e `src/Entities/Player.js`.
+- **Pontos de referência úteis:**
+  - `src/Pages/Home.jsx` (orquestra estados, persistência e regras).
+  - `src/Components/Pelada/GameTimer.jsx` (timer e pausa).
+  - `src/Components/Pelada/QueueSection.jsx` (fila por blocos).
+  - `vite.config.js` (alias `@`, PWA, portas).
 
-- **Solicitações ao agente:**
-  - Ao pedir mudanças, inclua: arquivo(s) alvo, comportamento esperado, e exemplo de entrada/saída se for lógica (ex.: como a fila deve se comportar ao remover um jogador).
-
-Se precisar, atualizo este arquivo com exemplos de código ou decisões de arquitetura mais profundas — diga quais áreas você quer detalhar (ex.: fluxo de estado do timer, modelagem de jogador, ou convenções CSS).
+Se quiser, posso adicionar exemplos de snippets (uso de `useWakeLock`, padrão de `RadioGroup`, ou um checklist para revisar mudanças em `Home.jsx`). Diga o que prefere detalhar.

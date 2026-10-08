@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Ocultar barra de rolagem horizontal em navegadores comuns */
+.scrollbar-none {
+	scrollbar-width: none; /* Firefox */
+}
+.scrollbar-none::-webkit-scrollbar {
+	display: none; /* Chrome, Safari */
+}

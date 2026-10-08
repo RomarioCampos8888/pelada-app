@@ -18,31 +18,32 @@ export default function TeamCard({ title, players, variant, onRemovePlayer, empt
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`rounded-2xl overflow-hidden border border-slate-200 shadow-lg ${bgVariants[variant]}`}
+      className={`rounded-xl sm:rounded-2xl overflow-hidden border border-slate-200 shadow-lg ${bgVariants[variant]}`}
     >
-      <div className={`bg-gradient-to-r ${headerVariants[variant]} p-4`}>
-        <div className="flex items-center gap-3">
-          <div className="bg-white/20 rounded-full p-2">
-            <Shield className="w-5 h-5 text-white" />
+      <div className={`bg-gradient-to-r ${headerVariants[variant]} p-2 sm:p-4`}>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="bg-white/20 rounded-full p-1.5 sm:p-2">
+            <Shield className="w-4 h-4 text-white sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h3 className="text-white font-bold text-lg">{title}</h3>
-            <p className="text-white/80 text-sm">{players.length} jogadores</p>
+            <h3 className="text-white font-bold text-sm sm:text-lg">{title}</h3>
+            <p className="text-white/80 text-xs sm:text-sm">{players.length} jogadores</p>
           </div>
         </div>
       </div>
       
-      <div className="p-4 space-y-2">
+      <div className="p-2 sm:p-4 flex flex-wrap gap-1.5 sm:gap-2">
         <AnimatePresence mode="popLayout">
           {players.length > 0 ? (
             players.map((player, index) => (
-              <PlayerCard
-                key={player}
-                player={player}
-                variant={variant}
-                index={index}
-                onRemove={() => onRemovePlayer(player, index)}
-              />
+              <div key={player} className="basis-[calc(50%-0.1875rem)] sm:basis-[calc(50%-0.25rem)] min-w-0">
+                <PlayerCard
+                  player={player}
+                  variant={variant}
+                  index={index}
+                  onRemove={() => onRemovePlayer(player, index)}
+                />
+              </div>
             ))
           ) : (
             <motion.div
